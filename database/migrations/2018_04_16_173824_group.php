@@ -13,7 +13,11 @@ class Group extends Migration
      */
     public function up()
     {
-        //
+      Schema::create('groups', function($table) ) {
+        $table->increments('id');
+        $table->integer('group_id')->unique();
+        $table->string('group_name')->nullable($value = true);
+      )};
     }
 
     /**
@@ -23,6 +27,6 @@ class Group extends Migration
      */
     public function down()
     {
-        //
+      Schema::drop('group');
     }
 }
