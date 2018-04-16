@@ -17,11 +17,13 @@ class Person extends Migration
       Schema::create('people', function($table) {
         $table->increments('id');
         $table->integer('person_id')->unique();
-        $table->sting('first_name');
-        $table->sting('last_name');
-        $table->sting('email');
-        $table->foreign('group_id')->references('group_id')->on('groups');
+        $table->integer('group_id')->unique();
+        $table->string('first_name');
+        $table->string('last_name');
+        $table->string('email');
         $table->boolean('status');
+        $table->foreign('group_id')->references('group_id')->on('groups');
+      });
     }
 
     /**

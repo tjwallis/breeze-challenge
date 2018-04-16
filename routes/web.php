@@ -11,6 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'Group@index');
+Route::view('/import', 'import')->name('import');
+Route::post('/import', 'ImportCSV')->name('handle_import_form');
