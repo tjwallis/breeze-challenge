@@ -10,13 +10,11 @@ class Group extends Controller
     return view('welcome', ['groups' => \App\Group::all()]);
   }
 
-  public function show($id) {
+  public function listPeople($id) {
+    $group = \App\Group::findOrFail($id);
+    $people = $group->people()->where('status', 1)->get();
 
+    return response()->json($people->toArray());
   }
 
-  public function import_csv($rows) {
-
-    $this->CreateOrUpdate();
-
-  }
 }

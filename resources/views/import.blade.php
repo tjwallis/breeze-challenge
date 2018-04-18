@@ -2,13 +2,10 @@
 
 @section( 'content' )
         <div class="row">
-            <div class="col-md-8">
-                <div class="panel panel-default">
-                    <div class="panel-heading">CSV Import</div>
-
-                    <div class="panel-body">
-
-
+            <div class="col">
+                <div class="card bg-light" id="csv_panel">
+                    <div class="card-header">CSV Import</div>
+                    <div class="card-body">
 
 @if($errors)
    @foreach ($errors->all() as $error)
@@ -16,31 +13,24 @@
   @endforeach
 @endif
 
-                        <form class="form-horizontal" method="POST" action="{{ route('handle_import_form') }}" enctype="multipart/form-data">
+                        <form id="import_csv" class="form-horizontal" method="POST" action="{{ route('handle_import_form') }}" enctype="multipart/form-data">
                             {{ csrf_field() }}
 
-                            <div class="form-group{{ $errors->has('csv_file') ? ' has-error' : '' }}">
-                                <label for="csv_file" class="col-md-4 control-label">CSV file to import</label>
-
-                                <div class="col-md-6">
-                                    <input id="csv_file" type="file" class="form-control" name="csv_file" required>
-
+                                <div class="input-group mb-3">
+                                  <div class="custom-file">
+                                    <input id="csv_file" type="file" class="custom-file-input" name="csv_file" required>
+<label class="custom-file-label" for="csv_file">Choose file</label>
+                                  </div>
                                     @if ($errors->has('csv_file'))
                                         <span class="help-block">
                                         <strong>{{ $errors->first('csv_file') }}</strong>
                                     </span>
                                     @endif
-                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <div class="col-md-6 col-md-offset-4">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" name="has_header" checked> File contains header row?
-                                        </label>
-                                    </div>
-                                </div>
+                            <div class="form-check">
+                              <input type="checkbox" class="form-check-input" id="has_header" name="has_header" checked>                      
+                              <label class="form-check-label" for="has_header">File contains header row? </label>
                             </div>
 
                             <div class="form-group">
@@ -50,6 +40,7 @@
                                     </button>
                                 </div>
                             </div>
+
                         </form>
                     </div>
                 </div>

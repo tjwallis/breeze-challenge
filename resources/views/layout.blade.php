@@ -11,7 +11,7 @@
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
 
         <!-- Styles --><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
         <style>
@@ -65,6 +65,19 @@
             .m-b-md {
                 margin-bottom: 30px;
             }
+
+            #groups_table th:hover {
+              background: grey;
+            }
+
+            th.asc:after {
+              content: '\25b2';
+            }
+
+            th.desc:after {
+              content: '\25bc';
+            }
+
         </style>
     </head>
     <body>
@@ -83,5 +96,100 @@
             </div>
         </div>
       </div>
+      <script>
+        $("*[ajax-call]").on('click', function(e) {
+          $('this').addClass('active');
+          var url = $(this).attr('ajax-call');
+          e.preventDefault();
+        
+        $.ajax({
+          type:'get',
+          url: url,
+          success: function (response) {
+            var trHTML = '';
+            $("#groups_table tbody").empty();
+            $.each(response, function (i, item) {
+              trHTML += '<tr scope="col"><td>' + item.id + '</td><td>' + item.first_name + '</td><td>' + item.last_name + '</td><td>' + item.email + '</td></</tr>';
+            });
+
+            $('#groups_table tbody').append(trHTML);
+          }
+        });
+          });
+
+    $('#groups_table th').click(function(){
+      $('#groups_table th').removeClass('desc');
+      $('#groups_table th').removeClass('asc');
+      var table = $(this).parents('table').eq(0)
+      var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()))
+      this.asc = !this.asc
+      if (!this.asc){
+        rows = rows.reverse();
+        $(this).addClass('asc');
+      } else {
+        $(this).addClass('desc');
+      }
+      for (var i = 0; i < rows.length; i++){table.append(rows[i])}
+      });
+
+      function comparer(index) {
+          return function(a, b) {
+          var valA = getCellValue(a, index), valB = getCellValue(b, index)
+          return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+      }
+      }
+
+    function getCellValue(row, index){ return $(row).children('td').eq(index).text() }
+
+    $('#import_csv').on('submit', function(e){
+    
+      e.preventDefault();
+      $('#csv_panel .alert').remove();
+
+        $.ajax({
+            type: $(this).attr('method'),
+            url: $(this).attr('action'),
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            success: function (data) {
+              var rows = '';
+              rows += '<tr>';
+              $.each(Object.keys(data[0][0]), function (i, item) {
+                rows += '<th>' + item + '</th>';
+              });
+              rows += '</tr>';
+              $.each(data[0], function (i, row) {
+                rows += '<tr>';
+                $.each(row, function (i, item) {
+                  rows += '<td>' + item + '</td>';
+                });
+                rows += '</tr>';
+              });
+              $("#csv_panel").append('<div class="alert alert-success" role="alert">Submission was successful.</div>')
+              $("#csv_panel").append('<table class="alert alert-success" role="alert">' + rows + '</table>')
+
+                console.log('Submission was successful.');
+                console.log(data);
+            },
+            error: function (data) {
+              var items = "";
+              $.each(data.responseJSON.errors, function (i, item) {
+                if(item.isArray) {
+                  items += '<li>' + item[0] + '</li>';
+                } else {
+                  items += '<li>' + item + '</li>';
+                }
+              });
+              var html = '<div class="alert alert-danger" role="alert">' + items + '</div>';
+              $("#csv_panel").append(html);
+
+                console.log('An error occurred.');
+                console.log(data);
+            },
+        });
+    });
+
+      </script>
     </body>
 </html>
